@@ -2,6 +2,8 @@ package com.grinch.rivo4.controller.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import org.json.JSONArray
+import org.json.JSONObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -101,6 +103,61 @@ class PreferenceManager(context: Context) {
         setString(KEY_FAVORITES_ORDER, order.joinToString(","))
     }
 
+    fun getBlockedNumberRules(): List<BlockedNumberRule> {
+        val rawRules = getString(KEY_BLOCKED_NUMBER_RULES, "[]") ?: "[]"
+        return try {
+            val array = JSONArray(rawRules)
+            buildList {
+                for (index in 0 until array.length()) {
+                    val item = array.optJSONObject(index) ?: continue
+                    val pattern = item.optString("pattern", "").trim()
+                    if (pattern.isBlank()) continue
+
+                    val matchType = runCatching {
+                        BlockedNumberMatchType.valueOf(item.optString("matchType", BlockedNumberMatchType.STARTS_WITH.name))
+                    }.getOrDefault(BlockedNumberMatchType.STARTS_WITH)
+
+                    add(BlockedNumberRule(pattern = pattern, matchType = matchType))
+                }
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    fun setBlockedNumberRules(rules: List<BlockedNumberRule>) {
+        val array = JSONArray()
+        rules.forEach { rule ->
+            array.put(
+                JSONObject().apply {
+                    put("pattern", rule.pattern)
+                    put("matchType", rule.matchType.name)
+                }
+            )
+        }
+        setString(KEY_BLOCKED_NUMBER_RULES, array.toString())
+    }
+
+    fun addBlockedNumberRule(rule: BlockedNumberRule) {
+        val normalizedPattern = normalizePhoneNumber(rule.pattern).trim()
+        if (normalizedPattern.isBlank()) return
+
+        val currentRules = getBlockedNumberRules().toMutableList()
+        val candidate = rule.copy(pattern = normalizedPattern)
+
+        if (currentRules.none { it.pattern == candidate.pattern && it.matchType == candidate.matchType }) {
+            currentRules.add(candidate)
+            setBlockedNumberRules(currentRules)
+        }
+    }
+
+    fun removeBlockedNumberRule(rule: BlockedNumberRule) {
+        val currentRules = getBlockedNumberRules().filterNot {
+            it.pattern == rule.pattern && it.matchType == rule.matchType
+        }
+        setBlockedNumberRules(currentRules)
+    }
+
     companion object {
         const val KEY_DYNAMIC_COLORS = "dynamic_colors"
         const val KEY_AMOLED_MODE = "amoled_mode"
@@ -122,6 +179,7 @@ class PreferenceManager(context: Context) {
         const val KEY_BLOCK_METHOD = "block_method"
         const val KEY_BLOCK_LOG_VISIBILITY = "block_log_visibility"
         const val KEY_BLOCK_NOTIFICATION = "block_notification"
+        const val KEY_BLOCKED_NUMBER_RULES = "blocked_number_rules"
         const val KEY_VIBRATE_ON_ANSWER = "vibrate_on_answer"
         const val KEY_VIBRATE_ON_HANGUP = "vibrate_on_hangup"
         const val KEY_ROUND_AVATARS = "round_avatars"

@@ -181,7 +181,7 @@ class CallActivity : ComponentActivity() {
         if (powerManager.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
             proximityWakeLock = powerManager.newWakeLock(
                 PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
-                "RivoPhoneApp::ProximityWakeLock"
+                "RivoCall::ProximityWakeLock"
             )
         }
     }

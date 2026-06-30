@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
-import android.provider.BlockedNumberContract
 import android.telecom.Call
 import android.telecom.CallAudioState
 import android.telecom.DisconnectCause
@@ -20,6 +19,7 @@ import android.telecom.TelecomManager
 import android.telecom.VideoProfile
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
+import com.grinch.rivo4.controller.util.BlockedNumberRule
 import com.grinch.rivo4.controller.util.PreferenceManager
 import com.grinch.rivo4.modal.`interface`.IContactsRepository
 import kotlinx.coroutines.*
@@ -187,11 +187,9 @@ class CallService : InCallService() {
 
     private fun isNumberBlocked(number: String): Boolean {
         if (number.isEmpty()) return false
-        return try {
-            BlockedNumberContract.isBlocked(this, number)
-        } catch (e: Exception) {
-            false
-        }
+
+        val blockedRules = preferenceManager.getBlockedNumberRules()
+        return blockedRules.any { it.matches(number) }
     }
 
     private fun handleBlockedCall(call: Call, number: String) {

@@ -1,6 +1,6 @@
-# Rivo
+# RivoCall
 
-Rivo is an open-source Android dialer built with Jetpack Compose.
+RivoCall is an open-source Android dialer built with Jetpack Compose.
 
 The goal is simple: provide a clean, modern phone app without unnecessary clutter while keeping the core calling experience fast and reliable.
 
@@ -27,7 +27,7 @@ The goal is simple: provide a clean, modern phone app without unnecessary clutte
   </a>
 </p>
 
-RivoPhoneApp is currently under closed testing. You'd need to join this [Google Group](https://groups.google.com/g/rivophoneapp) before you can become a tester for the app.
+RivoCall is currently under closed testing. You'd need to join this [Google Group](https://groups.google.com/g/rivophoneapp) before you can become a tester for the app.
 
 ## Screenshots
 

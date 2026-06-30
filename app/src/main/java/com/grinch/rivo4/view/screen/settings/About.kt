@@ -163,7 +163,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
             Spacer(modifier = Modifier.height(18.dp))
 
             Text(
-                text = "© 2025-2026 RivoPhone Project",
+                text = "© 2025-2026 RivoCall Project",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline
             )
